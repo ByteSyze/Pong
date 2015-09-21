@@ -43,7 +43,7 @@ public class BallController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
 		if (ballCollider.bounds.Intersects (p1Collider.bounds)) {
 			h = -(h - hVelocityIncrement);
@@ -57,7 +57,7 @@ public class BallController : MonoBehaviour {
 
 		if (ballCollider.bounds.Intersects (ceilingCollider.bounds) || ballCollider.bounds.Intersects (floorCollider.bounds))
 			v = -v;
-	
+
 		transform.position += transform.right * h;
 		transform.position += transform.up * (v * vIntensity);
 	}

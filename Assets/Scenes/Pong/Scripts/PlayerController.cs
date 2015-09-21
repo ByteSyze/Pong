@@ -39,40 +39,63 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
-		if (GameType.GAMETYPE == GameType.PLAYER || (GameType.GAMETYPE == GameType.COMPUTER && player == 1)) {
-			if(Input.GetKey(keyUp))
+		bool p2Override = false;
+		if (Input.touchCount > 0)
+		{
+			foreach (Touch t in Input.touches)
 			{
-				if(!playerCollider.bounds.Intersects(ceilingCollider.bounds))
-					transform.position += transform.up * speed;
+				Ray ray = Camera.main.ScreenPointToRay(t.position);
+				RaycastHit hit;
+
+				if(Physics.Raycast(ray, out hit))
+				{
+					if((hit.point.x < 0 && player == 1))
+					{
+						transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+					}
+					if((hit.point.x > 0 && player == 2))
+					{
+						transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+						p2Override = true;
+					}
+				}
 			}
-			if(Input.GetKey(keyDown))
-				if(!playerCollider.bounds.Intersects(floorCollider.bounds))
-					transform.position += transform.up * -speed;
+		}
 
-		} else {
-			//AI goes here
+		if(!p2Override)
+		{
+			if (GameType.GAMETYPE == GameType.PLAYER || (GameType.GAMETYPE == GameType.COMPUTER && player == 1))
+			{
+				if (Input.GetKey (keyUp))
+				{
+					if (!playerCollider.bounds.Intersects (ceilingCollider.bounds))
+						transform.position += transform.up * speed;
+				}
+				if (Input.GetKey (keyDown))
+					if (!playerCollider.bounds.Intersects (floorCollider.bounds))
+						transform.position += transform.up * -speed;
 
-			float v = Mathf.Clamp ((ball.transform.position - transform.position).y, -speed, speed);
+			} else {
+				//AI goes here
 
-			float pos;
+				float v = Mathf.Clamp ((ball.transform.position - transform.position).y, -speed, speed);
+
+				float pos;
 
 			
-			if((v < 0 && !playerCollider.bounds.Intersects(floorCollider.bounds)) || (v > 0 && !playerCollider.bounds.Intersects(ceilingCollider.bounds)))
-			{
+				if ((v < 0 && !playerCollider.bounds.Intersects (floorCollider.bounds)) || (v > 0 && !playerCollider.bounds.Intersects (ceilingCollider.bounds))) {
 				
-				if(((ball.transform.position.x > 0 || ballController.h > 0) && player == 1) || ((ball.transform.position.x < 0 || ballController.h < 0) && player == 2))
-				{
-					//transform.position += transform.up * v
-					transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, 0, transform.position.z), speed/5);
-				}
-				else
-				{
-					//transform.position += transform.up * v;
-					pos = Mathf.Clamp((ball.transform.position.y - transform.position.y)*.3f, -speed, speed);
+					if (((ball.transform.position.x > 0 || ballController.h > 0) && player == 1) || ((ball.transform.position.x < 0 || ballController.h < 0) && player == 2)) {
+						//transform.position += transform.up * v
+						transform.position = Vector3.MoveTowards (transform.position, new Vector3 (transform.position.x, 0, transform.position.z), speed / 5);
+					} else {
+						//transform.position += transform.up * v;
+						pos = Mathf.Clamp ((ball.transform.position.y - transform.position.y) * .3f, -speed, speed);
 
-					transform.position += transform.up * pos;
+						transform.position += transform.up * pos;
+					}
 				}
 			}
 		}
